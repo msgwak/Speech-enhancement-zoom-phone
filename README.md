@@ -1,3 +1,6 @@
+# Prerequisite
+Run cells in `Demucs_Denooiser_Training_Example.ipynb` and `FullSubNet_Denoiser_Training_Example.ipynb` to get the baseline codes (Demucs and FullSubNet) and pre-trained eGeMAPS estimator.
+
 # DATASET
 mkdir train
 mkdir test
