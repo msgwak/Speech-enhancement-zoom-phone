@@ -96,13 +96,17 @@ if __name__ == "__main__":
         results.append(evals)
 
     results = np.array(results)
-    results = results.mean(axis=0).reshape((1,-1))
+    results_mean = np.nanmean(results, axis=0).reshape((1,-1))
     columns = ['PESQ', 'LLR', 'STOI', 'CSII_high', 'CSII_mid', 'CSII_low', 'NCM']
     
     print(columns)
-    print(f"[{results}]")
+    print(f"[{results_mean}]")
     
-    df = pd.DataFrame(data=results, columns=columns)
-    save_path = os.path.join(args.save_dir, f"{args.save_name}.csv")
-    df.to_csv(save_path)
-    print(f"Saved [{save_path}]")
+    df_all = pd.DataFrame(data=results, columns=columns)
+    df_mean = pd.DataFrame(data=results_mean, columns=columns)
+    save_path_all = os.path.join(args.save_dir, f"{args.save_name}_all.csv")
+    save_path_mean = os.path.join(args.save_dir, f"{args.save_name}_mean.csv")
+    df_all.to_csv(save_path_all)
+    df_mean.to_csv(save_path_mean)
+    print(f"Saved {save_path_all}")
+    print(f"Saved {save_path_mean}")    
