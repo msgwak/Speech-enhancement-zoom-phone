@@ -37,16 +37,24 @@ import speechmetrics
 
 sr = 16000
 
-FW_SNR_SEG = pysepm.fwSNRseg
+# FW_SNR_SEG = pysepm.fwSNRseg
+LLR = pysepm.llr
+CSII = pysepm.csii
+NCM = pysepm.ncm
 PESQ = speechmetrics.relative.pesq.load(window=None)
 STOI = speechmetrics.relative.stoi.load(window=None)
 
+np.seterr(divide = 'ignore') # for 'divide by 0 in log' error during calculating CSII
+
 def calc_metric(clean, noisy):
-    fwsnrseg = FW_SNR_SEG(clean, noisy, sr)
+    # fwsnrseg = FW_SNR_SEG(clean, noisy, sr)
+    llr = LLR(clean, noisy, sr)
+    csii_high, csii_mid, csii_low = CSII(clean, noisy, sr)
+    ncm = NCM(clean, noisy, sr)
     pesq = PESQ.test_window((noisy, clean), sr)['pesq']
     stoi = STOI.test_window((noisy, clean), sr)['stoi']
     
-    return [fwsnrseg, pesq, stoi]
+    return [pesq, llr, stoi, csii_high, csii_mid, csii_low, ncm]
 
 
 if __name__ == "__main__":
@@ -61,7 +69,13 @@ if __name__ == "__main__":
 
     clean_files = sorted(os.listdir(args.clean_dir))
     noisy_files = sorted(os.listdir(args.noisy_dir))
-    assert len(clean_files) == len(noisy_files)
+    if '.ipynb_checkpoints' in noisy_files:
+        noisy_files.remove('.ipynb_checkpoints')
+    try:
+        assert len(clean_files) == len(noisy_files)
+    except:
+        print("# of clean_files: ", len(clean_files))
+        print("# of noisy_files: ", len(noisy_files))
 
     results = []
 
@@ -83,7 +97,7 @@ if __name__ == "__main__":
 
     results = np.array(results)
     results = results.mean(axis=0).reshape((1,-1))
-    columns = ['fwSNRseg', 'PESQ', 'STOI']
+    columns = ['PESQ', 'LLR', 'STOI', 'CSII_high', 'CSII_mid', 'CSII_low', 'NCM']
     
     print(columns)
     print(f"[{results}]")
