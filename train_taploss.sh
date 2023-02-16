@@ -21,8 +21,16 @@ mkdir -p "./cfg"
 if [ ${model_name} = "demucs" ]
 then
   # TODO
-  cmd="python -m denoiser.enhance --model_path ${model_input_checkpoint_path} --noisy_dir ${noisy_paths} --out_dir ${model_output_checkpoint_path}"
-  echo $cmd
+
+  cmd="python -m denoiser.audio ${val_noisy_paths} > /content/test/noisy.json"
+  cmd="python -m denoiser.audio ${val_clean_paths} > /content/test/clean.json"
+
+  cmd="python -m denoiser.audio ${noisy_paths} > /content/train/noisy.json"
+  cmd="python -m denoiser.audio ${clean_paths} > /content/train/clean.json"
+
+  cmd="python -m dns_config.py"
+
+  cmd="python -m /content/TAPLoss-master/Demucs/denoiser/train.py dummy=waveform+1_pho_seg_ac_loss   continue_pretrained='dns64'   dset=custom_dns   acoustic_loss=True   acoustic_loss_only=False   phoneme_segmented=False   stft_loss=True   ac_loss_weight=${acoustic_weight}   stft_loss_weight=${stft_weight}   epochs=${epochs}   num_workers=2   batch_size=${batch_size}   ddp=${num_gpus} $@"echo $cmd
   eval $cmd
 elif [ ${model_name} = "fullsubnet" ]
 then
