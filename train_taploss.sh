@@ -1,30 +1,36 @@
 #!/bin/sh
 
-if [ "$#" -ne 10 ]; then
+if [ "$#" -ne 12 ]; then
   echo "You must enter exactly 10 command line arguments"
   exit 0
 fi
 
 noisy_paths=$1
 clean_paths=$2
-model_name=$3
-model_input_checkpoint_path=$4
-model_output_checkpoint_path=$5
-acoustic_weight=$6
-stft_weight=$7
-epochs=$8
-batch_size=$9
-num_gpus=${10}
+val_noisy_paths=$3
+val_clean_paths=$4
+model_name=$5
+model_input_checkpoint_path=$6
+model_output_checkpoint_path=$7
+acoustic_weight=$8
+stft_weight=$9
+epochs=${10}
+batch_size=${11}
+num_gpus=${12}
 
 mkdir -p "./cfg"
 
 if [ ${model_name} = "demucs" ]
 then
   # TODO
-  cmd="python -m dns_config.py"
+  cmd="python dns_config.py ${noisy_paths} ${val_noisy_paths}"
+  echo $cmd
   eval $cmd
-  cmd="python -m /content/TAPLoss-master/Demucs/denoiser/train.py dummy=waveform+1_pho_seg_ac_loss   continue_pretrained='dns64'   dset=custom_dns   acoustic_loss=True   acoustic_loss_only=False   phoneme_segmented=False   stft_loss=True   ac_loss_weight=${acoustic_weight}   stft_loss_weight=${stft_weight}   epochs=${epochs}   num_workers=2   batch_size=${batch_size}   ddp=${num_gpus} $@"echo $cmd
+
+  cmd="python3 content/TAPLoss-master/Demucs/denoiser/train.py dummy=waveform+1_pho_seg_ac_loss   continue_pretrained='dns64'   dset=custom_dns   acoustic_loss=True   acoustic_loss_only=False   phoneme_segmented=False   stft_loss=True   ac_loss_weight=${acoustic_weight}   stft_loss_weight=${stft_weight}   epochs=${epochs}   num_workers=2   batch_size=${batch_size}   ddp=${num_gpus}"
+  echo $cmd
   eval $cmd
+
 elif [ ${model_name} = "fullsubnet" ]
 then
   echo "Make toml files ..."
