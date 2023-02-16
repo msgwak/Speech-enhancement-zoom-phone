@@ -16,7 +16,7 @@ def ftn(train_path, test_path):
   #eval_every: 1
   """.format(train_path, test_path)
 
-  with open("./content/TAPLoss-master/Demucs/denoiser/conf/dset/custom_dns.yaml", "w") as f:
+  with open("/content/TAPLoss-master/Demucs/denoiser/conf/dset/custom_dns.yaml", "w") as f:
       # Writing data to a file
       f.write(dns_config)
 
