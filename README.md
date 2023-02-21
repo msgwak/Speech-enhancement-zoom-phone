@@ -1,3 +1,64 @@
+# New Ablation Scripts
+## Data Normalization
+Normalize audio files by run the code below.
+`normalize.py` will normalize files under `${source_directory_path}` and save outputs under `${normalized_directory_path}`.
+```
+python normalize.py ${source_directory_path} ${normalized_directory_path}
+```
+## Data Path List Preperation
+Demucs requires `json` files and FullSubNet requires `txt` files.
+### Demucs 
+to be updated
+### FullSubNet
+to be updated
+## Training
+### Demucs
+Set hyperparameters in `runner_demucs.sh`.
+The parameters are as follows in order:
+- noisy_paths: **Parent directory path** of clean and noisy json files, which contain lists of training audio file paths
+- clean_paths: Don't care term for Demucs
+- val_paths: **Parent directory path** of clean and noisy json files, which contain lists of validation audio file paths
+- model_name: Fixed as "demucs"
+- model_input_checkpoint_path: "dns48", **"dns64" (default)**, or "master64"
+- model_output_checkpoint_path: Don't care term for Demucs
+- acoustic_weight
+- stft_weight
+- epochs
+- batch_size
+- num_gpus
+
+Run the script as follows.
+```
+sh runner_demucs.sh
+```
+### FullSubNet
+Set hyperparameters in `runner_fsnet.sh`.
+- noisy_paths: Path of the **txt file**, which contains the list of training noisy audio file paths  
+- clean_paths: Path of the **txt file**, which contains the list of training clean audio file paths  
+- val_paths: Path of the directory, which contains `clean` and `noisy` directories
+- model_name: Fixed as "fullsubnet"
+- model_input_checkpoint_path: Path of checkpoint file (.pt file)
+- model_output_checkpoint_path: Path to save trained model checkpoints
+- acoustic_weigh
+- stft_weigh: Don't care term for fullsubnet
+- epoch
+- batch_size
+- num_gpus
+
+Run the script as follows.
+```
+sh runner_fsnet.sh
+```
+## Metric Evaluation
+### Demucs
+evaluation
+### FullSubNet
+output generation
+evaluation
+
+
+
+
 # Prerequisite
 Run cells in `Demucs_Denooiser_Training_Example.ipynb` and `FullSubNet_Denoiser_Training_Example.ipynb` to get the baseline codes (Demucs and FullSubNet) and pre-trained eGeMAPS estimator.
 
