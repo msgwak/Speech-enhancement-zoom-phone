@@ -7,11 +7,18 @@ python normalize.py ${source_directory_path} ${normalized_directory_path}
 ```
 ## Data Path List Preperation
 Demucs requires `json` files and FullSubNet requires `txt` files.
-### Demucs 
-to be updated
+### Demucs
+Install the denoiser library.
+```
+pip install denoiser
+```
+Make `clean.json` and `noisy.json` files for normalized clean and noisy data, respectively.
+```
+python3 -m denoiser.audio ${normalized_directory_path} > ${normalized_data_json}
+```
 ### FullSubNet
 to be updated
-## Training
+## Training, Denoising, and Evaluation 
 ### Demucs
 Set hyperparameters in `runner_demucs.sh`.
 The parameters are as follows in order:
@@ -31,7 +38,7 @@ Run the script as follows.
 ```
 sh runner_demucs.sh
 ```
-### FullSubNet
+### FullSubNet (Currently training-only)
 Set hyperparameters in `runner_fsnet.sh`.
 - noisy_paths: Path of the **txt file**, which contains the list of training noisy audio file paths  
 - clean_paths: Path of the **txt file**, which contains the list of training clean audio file paths  
@@ -49,12 +56,6 @@ Run the script as follows.
 ```
 sh runner_fsnet.sh
 ```
-## Metric Evaluation
-### Demucs
-evaluation
-### FullSubNet
-output generation
-evaluation
 
 
 ---
