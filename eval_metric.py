@@ -1,27 +1,3 @@
-# !pip install https://github.com/schmiph2/pysepm/archive/master.zip --quiet
-# !pip install git+https://github.com/aliutkus/speechmetrics#egg=speechmetrics[cpu] --quiet
-
-# # Noisy (DNS dataset)
-# python eval_metric.py \
-# --save_name noisy \
-# --save_dir ./ \
-# --clean_dir test/nrm_clean/ \
-# --noisy_dir test/nrm_noisy/
-
-# # Low (t-DNS dataset)
-# python eval_metric.py \
-# --save_name low \
-# --save_dir ./ \
-# --clean_dir test/nrm_clean/ \
-# --noisy_dir test/nrm_zm_phone_relay_low/
-
-# # Auto (Industry / don't normalize!)
-# python eval_metric.py \
-# --save_name auto \
-# --save_dir ./ \
-# --clean_dir test/nrm_clean/ \
-# --noisy_dir test/src_zm_phone_relay_auto/
-
 import argparse
 import os
 import re
@@ -46,15 +22,21 @@ STOI = speechmetrics.relative.stoi.load(window=None)
 
 np.seterr(divide = 'ignore') # for 'divide by 0 in log' error during calculating CSII
 
-def calc_metric(clean, noisy):
+def calc_metric(clean, noisy, calc_all):
     # fwsnrseg = FW_SNR_SEG(clean, noisy, sr)
-    llr = LLR(clean, noisy, sr)
-    csii_high, csii_mid, csii_low = CSII(clean, noisy, sr)
-    ncm = NCM(clean, noisy, sr)
-    pesq = PESQ.test_window((noisy, clean), sr)['pesq']
-    stoi = STOI.test_window((noisy, clean), sr)['stoi']
-    
-    return [pesq, llr, stoi, csii_high, csii_mid, csii_low, ncm]
+    if calc_all:
+        llr = LLR(clean, noisy, sr)
+        csii_high, csii_mid, csii_low = CSII(clean, noisy, sr)
+        ncm = NCM(clean, noisy, sr)
+        pesq = PESQ.test_window((noisy, clean), sr)['pesq']
+        stoi = STOI.test_window((noisy, clean), sr)['stoi']
+
+        return [pesq, llr, stoi, csii_high, csii_mid, csii_low, ncm]
+    else:
+        pesq = PESQ.test_window((noisy, clean), sr)['pesq']
+        stoi = STOI.test_window((noisy, clean), sr)['stoi']
+
+        return [pesq, stoi]
 
 
 if __name__ == "__main__":
@@ -63,6 +45,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_dir", required=True, type=str)
     parser.add_argument("--clean_dir", required=True, type=str)
     parser.add_argument("--noisy_dir", required=True, type=str)
+    parser.add_argument("--calc_all", required=False, default=False)
     args = parser.parse_args()
     
     print(f"Evaluate files in {args.noisy_dir} ...")
@@ -92,12 +75,15 @@ if __name__ == "__main__":
         clean_wav = librosa.load(os.path.join(args.clean_dir, clean_fname), sr=sr)[0]
         noisy_wav = librosa.load(os.path.join(args.noisy_dir, noisy_fname), sr=sr)[0]
 
-        evals = calc_metric(clean_wav, noisy_wav)
+        evals = calc_metric(clean_wav, noisy_wav, args.calc_all)
         results.append(evals)
 
     results = np.array(results)
     results_mean = np.nanmean(results, axis=0).reshape((1,-1))
-    columns = ['PESQ', 'LLR', 'STOI', 'CSII_high', 'CSII_mid', 'CSII_low', 'NCM']
+    if args.calc_all:
+        columns = ['PESQ', 'LLR', 'STOI', 'CSII_high', 'CSII_mid', 'CSII_low', 'NCM']
+    else:
+        columns = ['PESQ', 'STOI']
     
     print(columns)
     print(f"[{results_mean}]")

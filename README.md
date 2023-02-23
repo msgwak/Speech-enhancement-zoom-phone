@@ -15,9 +15,9 @@ to be updated
 ### Demucs
 Set hyperparameters in `runner_demucs.sh`.
 The parameters are as follows in order:
-- noisy_paths: **Parent directory path** of clean and noisy json files, which contain lists of training audio file paths
+- noisy_paths: **Parent directory path** of clean and noisy json files, which contain lists of training audio file paths (The path must end with /)
 - clean_paths: Don't care term for Demucs
-- val_paths: **Parent directory path** of clean and noisy json files, which contain lists of validation audio file paths
+- val_paths: **Parent directory path** of clean and noisy json files, which contain lists of validation audio file paths (The path must end with /)
 - model_name: Fixed as "demucs"
 - model_input_checkpoint_path: "dns48", **"dns64" (default)**, or "master64"
 - model_output_checkpoint_path: Don't care term for Demucs

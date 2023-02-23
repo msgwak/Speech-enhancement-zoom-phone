@@ -10,8 +10,8 @@ def ftn(train_path, test_path):
     train: {train_path}
     valid: {test_path}
     test: {test_path}
-    noisy_json:
-    noisy_dir:
+    noisy_json: 
+    noisy_dir: 
     matching: dns
   #eval_every: 1
   """
