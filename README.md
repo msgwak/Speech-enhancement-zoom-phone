@@ -1,12 +1,5 @@
 # New Ablation Scripts
 ## Data Download
-Download data under:
-- /content/data/train/src_clean
-- /content/data/train/src_zp_auto
-- /content/data/train/src_zp_low
-- /content/data/test/src_clean
-- /content/data/test/src_zp_auto
-- /content/data/test/src_zp_low
 ```
 mkdir -p /content/data/train/src_clean 
 mkdir -p /content/data/train/src_zp_auto
@@ -20,16 +13,24 @@ mkdir -p /content/data/test/src_clean
 mkdir -p /content/data/test/src_zp_auto
 mkdir -p /content/data/test/src_zp_low
 
-mkdir -p /content/data/test/nrm_zp_auto/clean/
-mkdir -p /content/data/test/nrm_zp_low/clean/
-mkdir -p /content/data/test/nrm_zp_auto/noisy/
-mkdir -p /content/data/test/nrm_zp_low/noisy/
+mkdir -p /content/data/test/nrm_zp_auto/no_reverb/clean/
+mkdir -p /content/data/test/nrm_zp_low/no_reverb/clean/
+mkdir -p /content/data/test/nrm_zp_auto/no_reverb/noisy/
+mkdir -p /content/data/test/nrm_zp_low/no_reverb/noisy/
 
 mkdir -p /content/data/paths/train/nrm_zp_auto/
 mkdir -p /content/data/paths/train/nrm_zp_low/
 mkdir -p /content/data/paths/test/nrm_zp_auto/
 mkdir -p /content/data/paths/test/nrm_zp_low/
 ```
+Download data under:
+- /content/data/train/src_clean
+- /content/data/train/src_zp_auto
+- /content/data/train/src_zp_low
+- /content/data/test/src_clean
+- /content/data/test/src_zp_auto
+- /content/data/test/src_zp_low
+
 
 ## Data Normalization
 Normalize audio files by run the code below.
@@ -41,10 +42,10 @@ python normalize.py /content/data/train/src_zp_auto/ /content/data/train/nrm_zp_
 python normalize.py /content/data/train/src_zp_low/ /content/data/train/nrm_zp_low/
 
 
-python normalize.py /content/data/test/src_clean/ /content/data/test/nrm_zp_auto/clean/
-python normalize.py /content/data/test/src_clean/ /content/data/test/nrm_zp_low/clean/
-python normalize.py /content/data/test/src_zp_auto/ /content/data/test/nrm_zp_auto/noisy/
-python normalize.py /content/data/test/src_zp_low/ /content/data/test/nrm_zp_low/noisy/
+python normalize.py /content/data/test/src_clean/ /content/data/test/nrm_zp_auto/no_reverb/clean/
+python normalize.py /content/data/test/src_clean/ /content/data/test/nrm_zp_low/no_reverb/clean/
+python normalize.py /content/data/test/src_zp_auto/ /content/data/test/nrm_zp_auto/no_reverb/noisy/
+python normalize.py /content/data/test/src_zp_low/ /content/data/test/nrm_zp_low/no_reverb/noisy/
 ```
 ## Data Path List Preperation
 ### Demucs
@@ -61,10 +62,10 @@ python3 -m denoiser.audio /content/data/train/nrm_clean/ > /content/data/paths/t
 python3 -m denoiser.audio /content/data/train/nrm_zp_auto/ > /content/data/paths/train/nrm_zp_auto/noisy.json
 python3 -m denoiser.audio /content/data/train/nrm_zp_low/ > /content/data/paths/train/nrm_zp_low/noisy.json
 
-python3 -m denoiser.audio /content/data/test/nrm_zp_auto/clean/ > /content/data/paths/test/nrm_zp_auto/clean.json
-python3 -m denoiser.audio /content/data/test/nrm_zp_low/clean/ > /content/data/paths/test/nrm_zp_low/clean.json
-python3 -m denoiser.audio /content/data/test/nrm_zp_auto/noisy/ > /content/data/paths/test/nrm_zp_auto/noisy.json
-python3 -m denoiser.audio /content/data/test/nrm_zp_low/noisy/ > /content/data/paths/test/nrm_zp_low/noisy.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_auto/no_reverb/clean/ > /content/data/paths/test/nrm_zp_auto/clean.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_low/no_reverb/clean/ > /content/data/paths/test/nrm_zp_low/clean.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_auto/no_reverb/noisy/ > /content/data/paths/test/nrm_zp_auto/noisy.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_low/no_reverb/noisy/ > /content/data/paths/test/nrm_zp_low/noisy.json
 ```
 ### FullSubNet
 FullSubNet requires `txt` files, which contain the lists of clean and noisy data paths, respectively.
@@ -76,10 +77,10 @@ python txt_fsnet.py --data_dir /content/data/train/nrm_clean/ --save_dir /conten
 python txt_fsnet.py --data_dir /content/data/train/nrm_zp_auto/ --save_dir /content/data/paths/train/nrm_zp_auto/ --save_name noisy
 python txt_fsnet.py --data_dir /content/data/train/nrm_zp_low/ --save_dir /content/data/paths/train/nrm_zp_low/ --save_name noisy
 
-python txt_fsnet.py --data_dir /content/data/test/nrm_zp_auto/clean/ --save_dir /content/data/paths/test/nrm_zp_auto/ --save_name clean
-python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/clean/ --save_dir /content/data/paths/test/nrm_zp_low/ --save_name clean
-python txt_fsnet.py --data_dir /content/data/test/nrm_zp_auto/noisy/ --save_dir /content/data/paths/test/nrm_zp_auto/ --save_name noisy
-python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/noisy/ --save_dir /content/data/paths/test/nrm_zp_low/ --save_name noisy
+python txt_fsnet.py --data_dir /content/data/test/nrm_zp_auto/no_reverb/clean/ --save_dir /content/data/paths/test/nrm_zp_auto/ --save_name clean
+python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/no_reverb/clean/ --save_dir /content/data/paths/test/nrm_zp_low/ --save_name clean
+python txt_fsnet.py --data_dir /content/data/test/nrm_zp_auto/no_reverb/noisy/ --save_dir /content/data/paths/test/nrm_zp_auto/ --save_name noisy
+python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/no_reverb/noisy/ --save_dir /content/data/paths/test/nrm_zp_low/ --save_name noisy
 ```
 
 ## Training, Denoising, and Evaluation 
