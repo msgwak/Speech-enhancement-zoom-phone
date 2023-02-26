@@ -30,7 +30,6 @@ then
   eval $cmd
   demucs_save_path="./outputs/exp_ac_loss_weight=${acoustic_weight},acoustic_loss=True,acoustic_loss_only=False,batch_size=${batch_size},continue_pretrained=${model_input_checkpoint_path},dset=custom_dns,dummy=waveform+1_pho_seg_ac_loss,epochs=${epochs},phoneme_segmented=False,stft_loss=True,stft_loss_weight=${stft_weight}"
   
-  
   echo "Denoising test audio files ..."
   mkdir -p ${demucs_save_path}/denoised/
   cmd="python -m denoiser.enhance --model_path=${demucs_save_path}/best.th --noisy_dir=${val_paths} --out_dir=${demucs_save_path}/denoised/"
@@ -44,7 +43,7 @@ then
   eval $cmd
   
   echo "Evaluating denoised audio files ..."
-  cmd="python eval_metric.py --save_name pesq_stoi --save_dir ${demucs_save_path} --clean_dir ${val_paths}/clean/ --noisy_dir ${demucs_save_path}/denoised_nrm"
+  cmd="python eval_metric.py --save_name pesq_stoi --save_dir ${demucs_save_path} --clean_dir /content/data/test/nrm_zp_auto/clean/ --noisy_dir ${demucs_save_path}/denoised_nrm"
   echo $cmd
   eval $cmd
 
@@ -53,6 +52,7 @@ then
 elif [ ${model_name} = "fullsubnet" ]
 then
   echo "Making toml files ..."
+  model_output_checkpoint_path="${model_output_checkpoint_path}/ac=${acoustic_weight},"
   cmd="python config_fsnet.py --batch_size ${batch_size} --gamma ${acoustic_weight} --epochs ${epochs} --save_dir ${model_output_checkpoint_path} --noisy_paths ${noisy_paths} --clean_paths ${clean_paths} --val_paths ${val_paths}"
   echo $cmd
   eval $cmd
@@ -64,4 +64,14 @@ then
   cmd="${cmd} -P ${model_input_checkpoint_path}"
   echo $cmd
   eval $cmd
+  
+  echo "Denoising test audio files ..."
+  cmd="python /content/TAPLoss-master/FullSubNet/recipes/dns_interspeech_2020/inference.py"
+  cmd="${cmd} -C /content/TAPLoss-master/FullSubNet/recipes/dns_interspeech_2020/fullsubnet/custom_fsnet_test.toml"
+  cmd="${cmd} -M ${model_output_checkpoint_path}/custom_fsnet/checkpoints/best_model.tar"
+  cmd="${cmd} -O ${model_output_checkpoint_path}/result/"
+  
+  echo "Normalizing denoised audio files ..."
+  
+  echo "Evaluating denoised audio files ..."
 fi
