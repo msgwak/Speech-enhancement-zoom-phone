@@ -1,23 +1,58 @@
 # New Ablation Scripts
+## Data Download
+Download data under:
+- /content/data/train/src_clean
+- /content/data/train/src_zp_auto
+- /content/data/train/src_zp_low
+- /content/data/test/src_clean
+- /content/data/test/src_zp_auto
+- /content/data/test/src_zp_low
+
 ## Data Normalization
 Normalize audio files by run the code below.
 `normalize.py` will normalize files under `${source_directory_path}` and save outputs under `${normalized_directory_path}`.
+Command: `python normalize.py ${source_directory_path} ${normalized_directory_path}`
 ```
-python normalize.py ${source_directory_path} ${normalized_directory_path}
+python normalize.py /content/data/train/src_clean/ /content/data/train/nrm_clean/
+python normalize.py /content/data/train/src_zp_auto/ /content/data/train/nrm_zp_auto/
+python normalize.py /content/data/train/src_zp_low/ /content/data/train/nrm_zp_low/
+
+python normalize.py /content/data/test/src_clean/ /content/data/test/nrm_clean/
+python normalize.py /content/data/test/src_zp_auto/ /content/data/test/nrm_zp_auto/
+python normalize.py /content/data/test/src_zp_low/ /content/data/test/nrm_zp_low/
 ```
 ## Data Path List Preperation
-Demucs requires `json` files and FullSubNet requires `txt` files.
 ### Demucs
+Demucs requires `json` files, which contain the lists of clean and noisy data paths, respectively.
 Install the denoiser library.
 ```
 pip install denoiser
 ```
 Make `clean.json` and `noisy.json` files for normalized clean and noisy data, respectively.
+Command: `python3 -m denoiser.audio ${normalized_directory_path} > ${normalized_data_json}`
 ```
-python3 -m denoiser.audio ${normalized_directory_path} > ${normalized_data_json}
+python3 -m denoiser.audio /content/data/train/nrm_clean/ > /content/data/train/paths/nrm_clean.json
+python3 -m denoiser.audio /content/data/train/nrm_zp_auto/ > /content/data/train/paths/nrm_auto.json
+python3 -m denoiser.audio /content/data/train/nrm_zp_low/ > /content/data/train/paths/nrm_low.json
+
+python3 -m denoiser.audio /content/data/test/nrm_clean/ > /content/data/test/paths/nrm_clean.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_auto/ > /content/data/test/paths/nrm_auto.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_low/ > /content/data/test/paths/nrm_low.json
 ```
 ### FullSubNet
-to be updated
+FullSubNet requires `txt` files, which contain the lists of clean and noisy data paths, respectively.
+Make `clean.txt` and `noisy.txt` files for normalized clean and noisy data, respectively.
+Command: `python txt_fsnet.py --data_dir ${normalized_directory_path} --save_dir ${save_dir} --save_name ${save_name}`
+```
+python txt_fsnet.py --data_dir /content/data/train/nrm_clean/ --save_dir /content/data/train/paths/ --save_name nrm_clean
+python txt_fsnet.py --data_dir /content/data/train/nrm_zp_auto/ --save_dir /content/data/train/paths/ --save_name nrm_zp_auto
+python txt_fsnet.py --data_dir /content/data/train/nrm_zp_low/ --save_dir /content/data/train/paths/ --save_name nrm_zp_low
+
+python txt_fsnet.py --data_dir /content/data/test/nrm_clean/ --save_dir /content/data/test/paths/ --save_name nrm_clean
+python txt_fsnet.py --data_dir /content/data/test/nrm_zp_auto/ --save_dir /content/data/test/paths/ --save_name nrm_zp_auto
+python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/ --save_dir /content/data/test/paths/ --save_name nrm_zp_low
+```
+
 ## Training, Denoising, and Evaluation 
 ### Demucs
 Set hyperparameters in `runner_demucs.sh`.
@@ -38,7 +73,7 @@ Run the script as follows.
 ```
 sh runner_demucs.sh
 ```
-### FullSubNet (Currently training-only)
+### FullSubNet `(Currently training-only)`
 Set hyperparameters in `runner_fsnet.sh`.
 - noisy_paths: Path of the **txt file**, which contains the list of training noisy audio file paths  
 - clean_paths: Path of the **txt file**, which contains the list of training clean audio file paths  
@@ -58,9 +93,10 @@ sh runner_fsnet.sh
 ```
 
 
----
 
 
+
+<!--
 
 # Prerequisite
 Run cells in `Demucs_Denooiser_Training_Example.ipynb` and `FullSubNet_Denoiser_Training_Example.ipynb` to get the baseline codes (Demucs and FullSubNet) and pre-trained eGeMAPS estimator.
@@ -229,3 +265,5 @@ python /content/TAPLoss-master/FullSubNet/recipes/dns_interspeech_2020/inference
 ### save results
 cd result/fullsubnet/nrm/taploss/auto/
 zip -q /home/GMS/02_IDL-project/denoised_fsnet_taploss_nrm_auto.zip enhanced_0000/*
+
+-->
