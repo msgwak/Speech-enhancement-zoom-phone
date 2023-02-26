@@ -6,7 +6,7 @@ sh train_taploss.sh \
 /content/data/paths/test/nrm_zp_auto/ \
 demucs \
 dns64 \
-model/ \
+dontcareterm \
 1.0 \
 0.1 \
 2 \

@@ -17,8 +17,7 @@ epochs=$9
 batch_size=${10}
 num_gpus=${11}
 
-if [ ${model_name} = "demucs" ]
-then
+if [ ${model_name} = "demucs" ]; then
   echo "Making a yaml file ..."
   cmd="python config_demucs.py ${noisy_paths} ${val_paths}"
   echo $cmd
@@ -43,16 +42,12 @@ then
   eval $cmd
   
   echo "Evaluating denoised audio files ..."
-  cmd="python eval_metric.py --save_name pesq_stoi --save_dir ${demucs_save_path} --clean_dir /content/data/test/nrm_zp_auto/clean/ --noisy_dir ${demucs_save_path}/denoised_nrm"
+  cmd="python eval_metric.py --save_name pesq_stoi --save_dir ${demucs_save_path} --clean_dir /content/data/test/nrm_zp_auto/no_reverb/clean/ --noisy_dir ${demucs_save_path}/denoised_nrm"
   echo $cmd
   eval $cmd
-
-
-
-elif [ ${model_name} = "fullsubnet" ]
-then
+elif [ ${model_name} = "fullsubnet" ]; then
   echo "Making toml files ..."
-  model_output_checkpoint_path="${model_output_checkpoint_path}/ac=${acoustic_weight},"
+  model_output_checkpoint_path="${model_output_checkpoint_path}/ac=${acoustic_weight},bs=${batch_size},epochs=${epochs}"
   cmd="python config_fsnet.py --batch_size ${batch_size} --gamma ${acoustic_weight} --epochs ${epochs} --save_dir ${model_output_checkpoint_path} --noisy_paths ${noisy_paths} --clean_paths ${clean_paths} --val_paths ${val_paths}"
   echo $cmd
   eval $cmd
@@ -69,9 +64,19 @@ then
   cmd="python /content/TAPLoss-master/FullSubNet/recipes/dns_interspeech_2020/inference.py"
   cmd="${cmd} -C /content/TAPLoss-master/FullSubNet/recipes/dns_interspeech_2020/fullsubnet/custom_fsnet_test.toml"
   cmd="${cmd} -M ${model_output_checkpoint_path}/custom_fsnet/checkpoints/best_model.tar"
-  cmd="${cmd} -O ${model_output_checkpoint_path}/result/"
+  cmd="${cmd} -O ${model_output_checkpoint_path}/custom_fsnet/denoised/"
+  echo $cmd
+  eval $cmd
   
   echo "Normalizing denoised audio files ..."
+  result_path=$(find ${model_output_checkpoint_path}/custom_fsnet/denoised/ -name "enhanced*" -type d)
+  mkdir -p ${model_output_checkpoint_path}/custom_fsnet/denoised_nrm/
+  cmd="python normalize.py ${result_path} ${model_output_checkpoint_path}/custom_fsnet/denoised_nrm/"
+  echo $cmd
+  eval $cmd
   
   echo "Evaluating denoised audio files ..."
+  cmd="python eval_metric.py --save_name pesq_stoi --save_dir ${model_output_checkpoint_path}/custom_fsnet/ --clean_dir /content/data/test/nrm_zp_auto/no_reverb/clean/ --noisy_dir ${model_output_checkpoint_path}/custom_fsnet/denoised_nrm/"
+  echo $cmd
+  eval $cmd
 fi

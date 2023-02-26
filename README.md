@@ -1,5 +1,5 @@
 # New Ablation Scripts
-## Data Download
+## 1. Data Download
 ```
 mkdir -p /content/data/train/src_clean 
 mkdir -p /content/data/train/src_zp_auto
@@ -32,9 +32,10 @@ Download data under:
 - /content/data/test/src_zp_low
 
 
-## Data Normalization
+## 2. Data Normalization
 Normalize audio files by run the code below.
 `normalize.py` will normalize files under `${source_directory_path}` and save outputs under `${normalized_directory_path}`.
+
 Command: `python normalize.py ${source_directory_path} ${normalized_directory_path}`
 ```
 python normalize.py /content/data/train/src_clean/ /content/data/train/nrm_clean/
@@ -47,14 +48,15 @@ python normalize.py /content/data/test/src_clean/ /content/data/test/nrm_zp_low/
 python normalize.py /content/data/test/src_zp_auto/ /content/data/test/nrm_zp_auto/no_reverb/noisy/
 python normalize.py /content/data/test/src_zp_low/ /content/data/test/nrm_zp_low/no_reverb/noisy/
 ```
-## Data Path List Preperation
-### Demucs
+## 3. Demucs Ablation
+### 3.1. Data Path List Preperation
 Demucs requires `json` files, which contain the lists of clean and noisy data paths, respectively.
 Install the denoiser library.
 ```
 pip install denoiser
 ```
 Make `clean.json` and `noisy.json` files for normalized clean and noisy data, respectively.
+
 Command: `python3 -m denoiser.audio ${normalized_directory_path} > ${normalized_data_json}`
 ```
 python3 -m denoiser.audio /content/data/train/nrm_clean/ > /content/data/paths/train/nrm_zp_auto/clean.json
@@ -67,9 +69,29 @@ python3 -m denoiser.audio /content/data/test/nrm_zp_low/no_reverb/clean/ > /cont
 python3 -m denoiser.audio /content/data/test/nrm_zp_auto/no_reverb/noisy/ > /content/data/paths/test/nrm_zp_auto/noisy.json
 python3 -m denoiser.audio /content/data/test/nrm_zp_low/no_reverb/noisy/ > /content/data/paths/test/nrm_zp_low/noisy.json
 ```
-### FullSubNet
+### 3.2. Training, Denoising, and Evaluation
+```
+sh demucs_zp_auto.sh
+sh demucs_zp_low.sh
+```
+Hyperparameters for demucs:
+- noisy_paths: **Parent directory path** of clean and noisy json files, which contain lists of training audio file paths (The path must end with /)
+- clean_paths: Don't care term for Demucs
+- val_paths: **Parent directory path** of clean and noisy json files, which contain lists of validation audio file paths (The path must end with /)
+- model_name: Fixed as "demucs"
+- model_input_checkpoint_path: "dns48", **"dns64" (default)**, or "master64"
+- model_output_checkpoint_path: Don't care term for Demucs
+- acoustic_weight
+- stft_weight
+- epochs
+- batch_size
+- num_gpus
+
+## 4. FullSubNet Ablation
+### 4.1. Data Path List Preperation
 FullSubNet requires `txt` files, which contain the lists of clean and noisy data paths, respectively.
 Make `clean.txt` and `noisy.txt` files for normalized clean and noisy data, respectively.
+
 Command: `python txt_fsnet.py --data_dir ${normalized_directory_path} --save_dir ${save_dir} --save_name ${save_name}`
 ```
 python txt_fsnet.py --data_dir /content/data/train/nrm_clean/ --save_dir /content/data/paths/train/nrm_zp_auto/ --save_name clean
@@ -82,27 +104,12 @@ python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/no_reverb/clean/ --
 python txt_fsnet.py --data_dir /content/data/test/nrm_zp_auto/no_reverb/noisy/ --save_dir /content/data/paths/test/nrm_zp_auto/ --save_name noisy
 python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/no_reverb/noisy/ --save_dir /content/data/paths/test/nrm_zp_low/ --save_name noisy
 ```
-
-## Training, Denoising, and Evaluation 
-### Demucs
-Set hyperparameters for demucs.
-- noisy_paths: **Parent directory path** of clean and noisy json files, which contain lists of training audio file paths (The path must end with /)
-- clean_paths: Don't care term for Demucs
-- val_paths: **Parent directory path** of clean and noisy json files, which contain lists of validation audio file paths (The path must end with /)
-- model_name: Fixed as "demucs"
-- model_input_checkpoint_path: "dns48", **"dns64" (default)**, or "master64"
-- model_output_checkpoint_path: Don't care term for Demucs
-- acoustic_weight
-- stft_weight
-- epochs
-- batch_size
-- num_gpus
+### 4.2. Training, Denoising, and Evaluation
 ```
-sh demucs_zp_auto.sh
-sh demucs_zp_low.sh
+sh fsnet_zp_auto.sh
+sh fsnet_zp_low.sh
 ```
-### FullSubNet `(Currently training-only)`
-Set hyperparameters for fullsubnet.
+Hyperparameters for fullsubnet:
 - noisy_paths: Path of the **txt file**, which contains the list of training noisy audio file paths  
 - clean_paths: Path of the **txt file**, which contains the list of training clean audio file paths  
 - val_paths: Path of the directory, which contains `clean` and `noisy` directories
@@ -114,10 +121,6 @@ Set hyperparameters for fullsubnet.
 - epoch
 - batch_size
 - num_gpus
-```
-sh fsnet_zp_auto.sh
-sh fsnet_zp_low.sh
-```
 
 
 

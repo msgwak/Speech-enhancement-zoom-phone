@@ -162,7 +162,7 @@ def make_toml(args):
     
     filename = f"/content/TAPLoss-master/FullSubNet/recipes/dns_interspeech_2020/fullsubnet/custom_fsnet_test.toml"
     with open(filename, 'w') as fp:
-        fp.write(train_toml) 
+        fp.write(test_toml) 
     print("Saved train toml: ", filename)
 
     
