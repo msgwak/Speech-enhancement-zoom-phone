@@ -61,8 +61,8 @@ python3 -m denoiser.audio /content/data/train/nrm_clean/ > /content/data/paths/t
 python3 -m denoiser.audio /content/data/train/nrm_zp_auto/ > /content/data/paths/train/nrm_zp_auto/noisy.json
 python3 -m denoiser.audio /content/data/train/nrm_zp_low/ > /content/data/paths/train/nrm_zp_low/noisy.json
 
-python3 -m denoiser.audio /content/data/test/nrm_zp_auto/clean/ /content/data/paths/test/nrm_zp_auto/clean.json
-python3 -m denoiser.audio /content/data/test/nrm_zp_low/clean/ /content/data/paths/test/nrm_zp_low/clean.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_auto/clean/ > /content/data/paths/test/nrm_zp_auto/clean.json
+python3 -m denoiser.audio /content/data/test/nrm_zp_low/clean/ > /content/data/paths/test/nrm_zp_low/clean.json
 python3 -m denoiser.audio /content/data/test/nrm_zp_auto/noisy/ > /content/data/paths/test/nrm_zp_auto/noisy.json
 python3 -m denoiser.audio /content/data/test/nrm_zp_low/noisy/ > /content/data/paths/test/nrm_zp_low/noisy.json
 ```
@@ -84,8 +84,7 @@ python txt_fsnet.py --data_dir /content/data/test/nrm_zp_low/noisy/ --save_dir /
 
 ## Training, Denoising, and Evaluation 
 ### Demucs
-Set hyperparameters in `runner_demucs.sh`.
-The parameters are as follows in order:
+Set hyperparameters for demucs.
 - noisy_paths: **Parent directory path** of clean and noisy json files, which contain lists of training audio file paths (The path must end with /)
 - clean_paths: Don't care term for Demucs
 - val_paths: **Parent directory path** of clean and noisy json files, which contain lists of validation audio file paths (The path must end with /)
@@ -97,13 +96,12 @@ The parameters are as follows in order:
 - epochs
 - batch_size
 - num_gpus
-
-Run the script as follows.
 ```
-sh runner_demucs.sh
+sh demucs_zp_auto.sh
+sh demucs_zp_low.sh
 ```
 ### FullSubNet `(Currently training-only)`
-Set hyperparameters in `runner_fsnet.sh`.
+Set hyperparameters for fullsubnet.
 - noisy_paths: Path of the **txt file**, which contains the list of training noisy audio file paths  
 - clean_paths: Path of the **txt file**, which contains the list of training clean audio file paths  
 - val_paths: Path of the directory, which contains `clean` and `noisy` directories
@@ -115,10 +113,9 @@ Set hyperparameters in `runner_fsnet.sh`.
 - epoch
 - batch_size
 - num_gpus
-
-Run the script as follows.
 ```
-sh runner_fsnet.sh
+sh fsnet_zp_auto.sh
+sh fsnet_zp_low.sh
 ```
 
 
